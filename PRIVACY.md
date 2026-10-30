@@ -26,3 +26,4 @@ Screenshots can contain whatever is on the page, such as customer data on a stag
 | `activeTab` | To act on the current tab when you click the icon or use a shortcut. |
 | `storage`, `unlimitedStorage` | To keep change requests and screenshots locally. Screenshots can exceed the default quota. |
 | `contextMenus` | For the *Review & export change requests* entry on the extension icon. |
+| `clipboardWrite` | For *Paste into chat…*: copies the next text or image step when you switch back to the review tab, without an extra click. |

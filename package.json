@@ -1,6 +1,6 @@
 {
   "name": "web-feedback-change-requests",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Chrome extension: draw and comment on any website, capture annotated screenshots, export change requests as an AI-ready prompt.",
   "type": "module",

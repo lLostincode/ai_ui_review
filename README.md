@@ -55,6 +55,7 @@ While you click through your app, you mark what should change. At the end you ha
   - a full-viewport context image
   - **DOM hints** (CSS selectors, test ids, aria labels, link targets and visible text of the elements in the region), so the agent can find the right component in your code
 - **Export:** a ZIP with `PROMPT.md`, `feedback.json` and `images/`, for all CRs or a single one. You can also copy the prompt or a single image to the clipboard.
+- **Paste into chat:** copy the prompt step by step, with the images embedded, straight into Claude Code or any chat that accepts pasted images. No files needed.
 - **Editable prompt template** with placeholders, so the instructions can match your team's workflow.
 - **Small:** plain JavaScript, no build step, no runtime dependencies, and all UI isolated in a shadow DOM so it doesn't conflict with the page's styles.
 
@@ -120,8 +121,8 @@ Open the review page with the **⇪** button in the panel, or by right-clicking 
 
 <img src="docs/screenshots/review.png" alt="Review page: change requests with their annotated frames on the left, export options and a live prompt preview on the right" width="900" />
 
-Here you can edit titles and notes, choose which CRs to include, and preview the generated prompt. Then click **Download ZIP**.
-Each CR also has its own **ZIP** and **Copy prompt** buttons.
+Here you can edit titles and notes, choose which CRs to include, and preview the generated prompt. Then click **Download ZIP**, or **Paste into chat…** to paste the prompt with embedded images directly (see [below](#pasting-directly-into-claude-code-or-a-chat)).
+Each CR also has its own **ZIP**, **Paste into chat…** and **Copy prompt** buttons.
 
 ## Keyboard shortcuts
 
@@ -197,10 +198,24 @@ Unzip the export, ideally into a git-ignored folder inside your repository (for 
 
 | Agent | Example |
 | --- | --- |
-| **Claude Code** | `claude "Read .feedback/<export>/PROMPT.md and the images it references, then implement all change requests."` |
+| **Claude Code** | `claude "Read .feedback/<export>/PROMPT.md and the images it references, then implement all change requests."`, or paste with the images embedded using **Paste into chat…** (see below) |
 | **Cursor / Windsurf** | Add `PROMPT.md` and the `images/` folder to the chat context and ask the agent to implement it. |
 | **GitHub Copilot (agent mode)** | Attach `PROMPT.md` and the images, then ask it to implement the CRs. |
-| **Chat UIs (claude.ai, ChatGPT, …)** | Paste the prompt from **Copy prompt** and drag in the images. **Copy image** puts single frames on the clipboard. |
+| **Chat UIs (claude.ai, ChatGPT, …)** | Use **Paste into chat…**, or paste the prompt from **Copy prompt** and drag in the images. |
+
+### Pasting directly into Claude Code or a chat
+
+Claude Code and most chat UIs embed images that you paste, but the clipboard holds only one image at a time.
+**Paste into chat…** (on the review page, for all selected CRs or a single one) turns the prompt into a short sequence of clipboard steps:
+
+| Layout | Sequence |
+| --- | --- |
+| **Interleaved** (default) | text → image 1 → text → image 2 → … Each image is pasted right after its `[Image N: CR-001 frame 1, annotated]` label. |
+| **Text first** | The full text with `[Image 1]` … `[Image N]` labels, then images 1 … N in order. |
+
+Click **Copy step 1**, switch to Claude Code and paste (<kbd>Ctrl</kbd>+<kbd>V</kbd>, or <kbd>Alt</kbd>+<kbd>V</kbd> on Windows). Then switch back.
+With **Auto-copy** on (the default), the next step is copied as soon as you return to the tab, so the loop is just *switch back → switch over → paste*.
+By default only the annotated images are included. Tick *context* or *clean* images if the agent needs more. Every step can be copied again from the list.
 
 Tips for good results:
 

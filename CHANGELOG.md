@@ -2,6 +2,16 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.1] - 2026-10-30
+
+### Added
+
+- **Paste into chat…** on the review page: copies the prompt as clipboard steps with embedded images, for Claude Code and chat UIs. It offers two layouts (interleaved, or text first then images), optional context and clean images, and auto-copies the next step when you switch back to the tab.
+
+### Fixed
+
+- **Copy image** now also works for JPEG context images (they are converted to PNG for the clipboard).
+
 ## [0.1.0] - 2026-10-30
 
 ### Added

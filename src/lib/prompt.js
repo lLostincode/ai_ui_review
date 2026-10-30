@@ -28,6 +28,11 @@ How to work:
 {{requests}}`;
 
 const PLACEHOLDER = /\{\{(\w+)\}\}/g;
+const MARKER = /\u0000IMG(\d+)\u0000/;
+
+function imageMarker(index) {
+  return `\u0000IMG${index}\u0000`;
+}
 
 export function crLabel(number) {
   return 'CR-' + String(number).padStart(3, '0');
@@ -108,7 +113,8 @@ function originOf(url) {
  * @param {boolean} [options.includeContext=true]
  * @param {boolean} [options.includeDomHints=true]
  * @param {Date} [options.date]
- * @returns {{markdown: string, images: {path: string, imageId: string}[], data: object}}
+ * @param {boolean} [options.imageMarkers=false] reference images with IMAGE_MARKER tokens instead of file paths
+ * @returns {{markdown: string, images: {path: string, imageId: string, label: string}[], data: object}}
  */
 export function buildExport(state, options = {}) {
   const {
@@ -117,6 +123,7 @@ export function buildExport(state, options = {}) {
     includeContext = true,
     includeDomHints = true,
     date = new Date(),
+    imageMarkers = false,
   } = options;
 
   const requests = state.requests.filter((r) => !requestIds || requestIds.includes(r.id));
@@ -142,19 +149,23 @@ export function buildExport(state, options = {}) {
       const origin = originOf(item.url);
       if (origin) origins.add(origin);
       const base = `images/${label}-${frameNo}`;
-      const add = (kind, ext) => {
+      const add = (kind, ext, description) => {
         const imageId = item.images?.[kind];
         if (!imageId) return null;
         const path = `${base}-${kind}.${ext}`;
-        images.push({ path, imageId });
-        return path;
+        images.push({ path, imageId, label: `${label} frame ${frameNo}, ${description}` });
+        return { path, marker: imageMarker(images.length - 1) };
       };
-      const annotated = add('annotated', 'png');
-      const clean = includeClean ? add('clean', 'png') : null;
-      const context = includeContext ? add('context', 'jpg') : null;
+      // Inline mention of an image: a marker for paste sequences, else its file path.
+      const mention = (ref) => (imageMarkers ? ref.marker : `\`${ref.path}\``);
+      const annotated = add('annotated', 'png', 'annotated');
+      const clean = includeClean ? add('clean', 'png', 'without annotations') : null;
+      const context = includeContext ? add('context', 'jpg', 'full viewport') : null;
 
       lines.push(`### ${label}.${step} Frame on \`${pagePath(item.url)}\``, '');
-      if (annotated) lines.push(`![${label} frame ${frameNo}, annotated](${annotated})`, '');
+      if (annotated) {
+        lines.push(imageMarkers ? annotated.marker : `![${label} frame ${frameNo}, annotated](${annotated.path})`, '');
+      }
       if (item.note?.trim()) lines.push(quote(item.note), '');
 
       const texts = item.annotations?.texts?.filter((t) => t.trim()) ?? [];
@@ -172,8 +183,8 @@ export function buildExport(state, options = {}) {
           `- Region: ${Math.round(r.w)}×${Math.round(r.h)} CSS px at x=${Math.round(r.x)}, y=${Math.round(r.y)} (document), viewport ${item.viewport.w}×${item.viewport.h} @${item.viewport.dpr}x`,
         );
       }
-      if (clean) lines.push(`- Without annotations: \`${clean}\``);
-      if (context) lines.push(`- Full viewport for context: \`${context}\``);
+      if (clean) lines.push(`- Without annotations: ${mention(clean)}`);
+      if (context) lines.push(`- Full viewport for context: ${mention(context)}`);
 
       const dom = item.dom;
       if (includeDomHints && dom && !dom.error) {
@@ -248,4 +259,42 @@ export function exportLabelFor(state, requestIds) {
     if (req) return [crLabel(req.number).toLowerCase(), slug(req.title)].filter(Boolean).join('-');
   }
   return slug(state.projectName) || 'web-feedback';
+}
+
+/**
+ * Splits the prompt into clipboard steps for chat UIs that embed pasted images
+ * (Claude Code, claude.ai, …). The clipboard holds one image at a time, so the
+ * user copies and pastes step by step.
+ *
+ * layout 'interleaved': text → image 1 → text → image 2 → … (each image right after its label)
+ * layout 'text-first':  the full text with [Image N: …] labels → image 1 → … → image N
+ *
+ * @returns {{steps: ({type: 'text', text: string} | {type: 'image', imageId: string, label: string, number: number})[], images: object[]}}
+ */
+export function buildPasteSequence(state, options = {}) {
+  const { layout = 'interleaved', ...rest } = options;
+  const { markdown, images } = buildExport(state, { ...rest, imageMarkers: true });
+  const label = (i) => `[Image ${i + 1}: ${images[i].label}]`;
+  const imageStep = (i) => ({ type: 'image', imageId: images[i].imageId, label: images[i].label, number: i + 1 });
+  // split() with a capture group alternates text and marker indices: [text, i, text, i, …, text]
+  const parts = markdown.split(new RegExp(MARKER.source, 'g'));
+  const steps = [];
+
+  if (layout === 'text-first') {
+    let text = parts.map((part, k) => (k % 2 ? label(Number(part)) : part)).join('').trimEnd();
+    if (images.length) {
+      text += `\n\nThe ${images.length} image(s) referenced above as [Image 1]…[Image ${images.length}] follow in that order.`;
+    }
+    steps.push({ type: 'text', text: text + '\n' });
+    images.forEach((_, i) => steps.push(imageStep(i)));
+    return { steps, images };
+  }
+
+  for (let k = 0; k < parts.length; k += 2) {
+    const index = k + 1 < parts.length ? Number(parts[k + 1]) : null;
+    const text = (parts[k] + (index === null ? '' : label(index))).trim();
+    if (text) steps.push({ type: 'text', text: text + '\n' });
+    if (index !== null) steps.push(imageStep(index));
+  }
+  return { steps, images };
 }

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildExport, crLabel, exportFolderName, exportLabelFor } from '../src/lib/prompt.js';
+import { buildExport, buildPasteSequence, crLabel, exportFolderName, exportLabelFor } from '../src/lib/prompt.js';
 
 const frame = (id, url, extra = {}) => ({
   id,
@@ -57,7 +57,7 @@ test('buildExport renders every request with image references and DOM hints', ()
   assert.match(markdown, /`label\.field` — "Plan"/);
   assert.doesNotMatch(markdown, /icon-chevron/, 'unlabelled icons are dropped');
   assert.equal(images.length, 6);
-  assert.deepEqual(images[0], { path: 'images/CR-001-1-annotated.png', imageId: 'f1-a' });
+  assert.deepEqual(images[0], { path: 'images/CR-001-1-annotated.png', imageId: 'f1-a', label: 'CR-001 frame 1, annotated' });
   assert.equal(data.requests[0].items[0].images.context, 'images/CR-001-1-context.jpg');
   assert.ok(!images.some((i) => i.imageId.endsWith('-o')), 'on-page overlay layer is not exported');
 });
@@ -85,4 +85,35 @@ test('export names are filesystem friendly', () => {
   assert.equal(exportFolderName(new Date(2026, 9, 29, 9, 5), 'portal'), 'portal-2026-10-29-0905');
   assert.equal(exportLabelFor(state, ['r1']), 'cr-001-fix-settings-card');
   assert.equal(exportLabelFor(state, ['r1', 'r2']), 'portal');
+});
+
+const pasteOptions = { includeClean: false, includeContext: false, includeDomHints: false };
+
+test('interleaved paste sequence puts each image right after its label', () => {
+  const { steps } = buildPasteSequence(state, { ...pasteOptions, layout: 'interleaved' });
+  assert.deepEqual(steps.map((s) => s.type), ['text', 'image', 'text', 'image', 'text']);
+  assert.match(steps[0].text, /## CR-001: Fix settings card[\s\S]*\[Image 1: CR-001 frame 1, annotated\]\n$/);
+  assert.deepEqual(steps[1], { type: 'image', imageId: 'f1-a', label: 'CR-001 frame 1, annotated', number: 1 });
+  assert.match(steps[2].text, /^> Padding missing here/);
+  assert.match(steps[2].text, /\[Image 2: CR-002 frame 1, annotated\]\n$/);
+  assert.equal(steps[3].imageId, 'f2-a');
+  assert.match(steps[4].text, /Text written on the screenshot/);
+  for (const step of steps.filter((s) => s.type === 'text')) {
+    assert.doesNotMatch(step.text, /\u0000|images\//, 'no markers or file paths leak into pasted text');
+  }
+});
+
+test('text-first paste sequence copies the whole text, then every image in order', () => {
+  const { steps } = buildPasteSequence(state, { ...pasteOptions, includeContext: true, layout: 'text-first' });
+  assert.deepEqual(steps.map((s) => s.type), ['text', 'image', 'image', 'image', 'image']);
+  assert.match(steps[0].text, /- Full viewport for context: \[Image 2: CR-001 frame 1, full viewport\]/);
+  assert.match(steps[0].text, /The 4 image\(s\) referenced above as \[Image 1\]…\[Image 4\] follow in that order\.\n$/);
+  assert.deepEqual(steps.slice(1).map((s) => s.imageId), ['f1-a', 'f1-x', 'f2-a', 'f2-x']);
+  assert.deepEqual(steps.slice(1).map((s) => s.number), [1, 2, 3, 4]);
+});
+
+test('file exports are unaffected by paste markers', () => {
+  const { markdown } = buildExport(state);
+  assert.doesNotMatch(markdown, /\u0000/);
+  assert.match(markdown, /- Without annotations: `images\/CR-001-1-clean\.png`/);
 });

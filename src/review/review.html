@@ -35,6 +35,7 @@
           </div>
           <div class="buttons">
             <button id="download-zip" class="primary">Download ZIP</button>
+            <button id="paste-chat" class="primary outline" title="Copy text and images step by step to paste into Claude Code or any chat">Paste into chat…</button>
             <button id="copy-prompt">Copy prompt</button>
           </div>
           <div class="buttons secondary">
@@ -63,6 +64,32 @@
         </details>
       </aside>
     </main>
+
+    <dialog id="paste-dialog" class="paste-dialog" aria-labelledby="paste-title">
+      <header class="paste-head">
+        <h2 id="paste-title">Paste into chat</h2>
+        <span id="paste-scope" class="muted small"></span>
+        <button id="paste-close" class="ghost" aria-label="Close">✕</button>
+      </header>
+      <p class="muted small">
+        The clipboard holds one image at a time, so copy one step, paste it into Claude Code
+        (<kbd>Ctrl</kbd>+<kbd>V</kbd>; <kbd>Alt</kbd>+<kbd>V</kbd> on Windows) or any chat that embeds images, and
+        come back for the next one. Pasted images are numbered in the order you paste them.
+      </p>
+      <fieldset class="paste-options">
+        <label><input type="radio" name="paste-layout" value="interleaved" checked /> <span><strong>Interleaved</strong>: text → image 1 → text → image 2 → …</span></label>
+        <label><input type="radio" name="paste-layout" value="text-first" /> <span><strong>Text first</strong>: the full text, then images 1 … n</span></label>
+        <label><input type="checkbox" id="paste-context" /> Include full-viewport context images</label>
+        <label><input type="checkbox" id="paste-clean" /> Include clean images (without drawings)</label>
+        <label><input type="checkbox" id="paste-auto" checked /> Auto-copy the next step when I switch back to this tab</label>
+      </fieldset>
+      <div class="paste-actions">
+        <button id="paste-next" class="primary big" autofocus>Copy step 1</button>
+        <button id="paste-restart" class="ghost">Start over</button>
+        <span id="paste-status" class="muted small" aria-live="polite"></span>
+      </div>
+      <ol id="paste-steps" class="paste-steps"></ol>
+    </dialog>
 
     <div id="lightbox" class="lightbox" hidden><img alt="" /></div>
     <div id="toast" class="toast" hidden></div>

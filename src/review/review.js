@@ -1,5 +1,5 @@
 import { loadState, mutate, getImages, imageIdsOf, removeImages, STATE_KEY } from '../lib/store.js';
-import { buildExport, crLabel, DEFAULT_TEMPLATE, exportFolderName, exportLabelFor } from '../lib/prompt.js';
+import { buildExport, buildPasteSequence, crLabel, DEFAULT_TEMPLATE, exportFolderName, exportLabelFor } from '../lib/prompt.js';
 import { createZip, dataUrlToBytes } from '../lib/zip.js';
 
 const $ = (id) => document.getElementById(id);
@@ -128,6 +128,7 @@ function renderRequest(req) {
       }),
       h('div', { class: 'request-actions' },
         h('button', { onclick: () => downloadZip([req.id]) }, 'ZIP'),
+        h('button', { onclick: () => openPasteDialog([req.id]), title: 'Copy text and images step by step' }, 'Paste into chat…'),
         h('button', { onclick: () => copyPrompt([req.id]) }, 'Copy prompt'),
         h('button', { class: 'ghost danger', title: 'Delete change request', onclick: () => deleteRequest(req) }, 'Delete'),
       ),
@@ -238,12 +239,119 @@ async function copyPrompt(requestIds) {
   toast('Prompt copied — image paths refer to the ZIP export');
 }
 
-async function copyImage(imageId) {
+// The async clipboard only accepts PNG images, so JPEG context shots are converted.
+async function writeImageToClipboard(imageId) {
   const src = images[imageId] ?? (await getImages([imageId]))[imageId];
-  if (!src) return toast('Image missing');
-  const blob = await (await fetch(src)).blob();
-  await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
-  toast('Image copied to clipboard');
+  if (!src) throw new Error('Image missing');
+  let blob = await (await fetch(src)).blob();
+  if (blob.type !== 'image/png') {
+    const bitmap = await createImageBitmap(blob);
+    const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+    canvas.getContext('2d').drawImage(bitmap, 0, 0);
+    blob = await canvas.convertToBlob({ type: 'image/png' });
+  }
+  await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+}
+
+async function copyImage(imageId) {
+  try {
+    await writeImageToClipboard(imageId);
+    toast('Image copied to clipboard');
+  } catch (err) {
+    toast('Could not copy image: ' + err.message);
+  }
+}
+
+// ------------------------------------------------------------------ paste into chat
+
+// Chat UIs embed pasted images, but the clipboard holds only one at a time,
+// so the prompt is copied as a sequence of text and image steps.
+const paste = {
+  dialog: $('paste-dialog'),
+  list: $('paste-steps'),
+  next: $('paste-next'),
+  status: $('paste-status'),
+  scope: $('paste-scope'),
+  auto: $('paste-auto'),
+  requestIds: [],
+  steps: [],
+  done: new Set(),
+  cursor: 0,
+  copying: false,
+  lastCopyAt: 0,
+};
+
+function openPasteDialog(requestIds) {
+  if (!requestIds.length) return toast('Nothing selected');
+  paste.requestIds = requestIds;
+  paste.scope.textContent = requestIds.length === 1
+    ? crLabel(state.requests.find((r) => r.id === requestIds[0])?.number ?? 0)
+    : `${requestIds.length} change requests`;
+  buildPasteSteps();
+  paste.dialog.showModal();
+  paste.next.focus();
+}
+
+function buildPasteSteps() {
+  const layout = paste.dialog.querySelector('input[name="paste-layout"]:checked').value;
+  paste.steps = buildPasteSequence(state, {
+    requestIds: paste.requestIds,
+    layout,
+    includeClean: $('paste-clean').checked,
+    includeContext: $('paste-context').checked,
+    includeDomHints: els.optDom.checked,
+  }).steps;
+  paste.done.clear();
+  paste.cursor = 0;
+  paste.status.textContent = '';
+  renderPasteSteps();
+}
+
+function renderPasteSteps() {
+  const total = paste.steps.length;
+  const finished = paste.cursor >= total;
+  paste.next.textContent = finished ? 'All steps copied ✓' : `Copy step ${paste.cursor + 1} of ${total}`;
+  paste.next.disabled = finished;
+  paste.list.replaceChildren(
+    ...paste.steps.map((step, i) => {
+      const preview = step.type === 'text'
+        ? h('span', { class: 'preview', title: step.text }, step.text.replace(/\s+/g, ' ').slice(0, 160))
+        : h('span', { class: 'preview' }, h('img', { src: images[step.imageId] ?? '', alt: '' }), step.label);
+      return h('li', { class: paste.done.has(i) ? 'done' : i === paste.cursor ? 'next' : '' },
+        h('span', { class: 'num' }, paste.done.has(i) ? '✓' : String(i + 1)),
+        h('span', { class: 'kind' }, step.type === 'text' ? 'Text' : `Image ${step.number}`),
+        preview,
+        h('button', { class: 'ghost small', onclick: () => copyPasteStep(i) }, paste.done.has(i) ? 'Copy again' : 'Copy'),
+      );
+    }),
+  );
+}
+
+async function copyPasteStep(i) {
+  const step = paste.steps[i];
+  if (!step || paste.copying) return;
+  paste.copying = true;
+  try {
+    if (step.type === 'text') await navigator.clipboard.writeText(step.text);
+    else await writeImageToClipboard(step.imageId);
+    paste.done.add(i);
+    paste.cursor = Math.max(paste.cursor, i + 1);
+    paste.lastCopyAt = Date.now();
+    const what = step.type === 'text' ? 'text' : `image ${step.number}`;
+    paste.status.textContent = `Step ${i + 1} (${what}) copied, now paste it into your chat.`;
+  } catch (err) {
+    paste.status.textContent = `Could not copy step ${i + 1}: ${err.message}`;
+  } finally {
+    paste.copying = false;
+    renderPasteSteps();
+  }
+}
+
+// Coming back from the chat window copies the next step automatically.
+function onPageRefocus() {
+  if (!paste.dialog.open || !paste.auto.checked || paste.cursor === 0) return;
+  if (paste.cursor >= paste.steps.length || Date.now() - paste.lastCopyAt < 800) return;
+  if (document.visibilityState === 'visible' && document.hasFocus()) copyPasteStep(paste.cursor);
 }
 
 function openLightbox(src) {
@@ -252,6 +360,16 @@ function openLightbox(src) {
 }
 
 // ------------------------------------------------------------------ wiring
+
+$('paste-chat').addEventListener('click', () => openPasteDialog(selectedIds()));
+$('paste-close').addEventListener('click', () => paste.dialog.close());
+paste.next.addEventListener('click', () => copyPasteStep(paste.cursor));
+$('paste-restart').addEventListener('click', buildPasteSteps);
+for (const input of paste.dialog.querySelectorAll('input[name="paste-layout"], #paste-clean, #paste-context')) {
+  input.addEventListener('change', buildPasteSteps);
+}
+window.addEventListener('focus', onPageRefocus);
+document.addEventListener('visibilitychange', () => setTimeout(onPageRefocus, 50));
 
 els.lightbox.addEventListener('click', () => (els.lightbox.hidden = true));
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') els.lightbox.hidden = true; });
