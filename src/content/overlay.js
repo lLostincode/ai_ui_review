@@ -174,6 +174,17 @@
     root.append(h('div', { class: 'pins' }), h('div', { class: 'panel' }));
     // Typing in our fields must not trigger the page's own keyboard shortcuts.
     for (const type of ['keydown', 'keyup', 'keypress']) root.addEventListener(type, (e) => e.stopPropagation());
+    // Clicking our buttons or the capture stage must not steal focus from the page's
+    // focused field (which would close its autocomplete menu, popovers, etc.), and the
+    // page's "click outside" handlers must not see these clicks either.
+    for (const type of ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click']) {
+      root.addEventListener(type, (e) => {
+        e.stopPropagation();
+        if (type === 'mousedown' && !e.composedPath().some((el) => el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) {
+          e.preventDefault();
+        }
+      });
+    }
     document.documentElement.append(host);
   }
 

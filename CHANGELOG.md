@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.2] - 2026-10-30
+
+### Fixed
+
+- Clicking **+ Frame** or the capture layer no longer steals focus from the page's focused field, so inline menus such as autocomplete popups stay open. The overlay also stops these clicks from reaching the page's "click outside" handlers.
+
 ## [0.1.1] - 2026-10-30
 
 ### Added
