@@ -1,0 +1,169 @@
+{
+  "project": "artaios.ai website",
+  "exportedAt": "2026-10-30T11:05:34.538Z",
+  "requests": [
+    {
+      "id": "CR-001",
+      "title": "Hero: give \"Book a Demo\" the same visual weight as the primary CTA",
+      "items": [
+        {
+          "type": "text",
+          "text": "The secondary CTA almost disappears on the dark hero. Use a brighter 1.5px border and the same height (48px) as \"Start 14-day trial\"."
+        },
+        {
+          "type": "frame",
+          "url": "https://www.artaios.ai/en",
+          "pageTitle": "ARTAIOS — Sovereign AI Workforce OS for mid-market companies",
+          "note": "Secondary CTA is barely visible",
+          "annotatedText": [
+            "same height"
+          ],
+          "region": {
+            "h": 97,
+            "w": 635,
+            "x": 165,
+            "y": 385
+          },
+          "viewport": {
+            "dpr": 1,
+            "h": 900,
+            "w": 1440
+          },
+          "images": {
+            "annotated": "images/CR-001-1-annotated.png",
+            "clean": "images/CR-001-1-clean.png",
+            "context": "images/CR-001-1-context.jpg"
+          },
+          "dom": {
+            "center": {
+              "href": "https://example.com/book-a-demo",
+              "selector": "div#top > div.relative.mx-auto:nth-of-type(3) > div.mt-8.flex:nth-of-type(2) > span.inline-block:nth-of-type(2) > a.border-border.text-secondary-foreground",
+              "tag": "a",
+              "text": "Book a Demo"
+            },
+            "container": {
+              "selector": "div#top > div.relative.mx-auto:nth-of-type(3)",
+              "tag": "div",
+              "text": "// THE AI WORKFORCE. SIMPLIFIED. The AI agent platform for mid-market companies — from chat to results in minutes. Fr…"
+            },
+            "elements": [
+              {
+                "href": "https://example.com/checkout",
+                "selector": "div#top > div.relative.mx-auto:nth-of-type(3) > div.mt-8.flex:nth-of-type(2) > span.inline-block:nth-of-type(1) > a.bg-primary.text-primary-foreground",
+                "tag": "a",
+                "text": "Start 14-day trial"
+              },
+              {
+                "selector": "div.relative.mx-auto:nth-of-type(3) > div.mt-8.flex:nth-of-type(2) > span.inline-block:nth-of-type(1) > a.bg-primary.text-primary-foreground > svg.lucide.lucide-arrow-right",
+                "tag": "svg"
+              },
+              {
+                "href": "https://example.com/book-a-demo",
+                "selector": "div#top > div.relative.mx-auto:nth-of-type(3) > div.mt-8.flex:nth-of-type(2) > span.inline-block:nth-of-type(2) > a.border-border.text-secondary-foreground",
+                "tag": "a",
+                "text": "Book a Demo"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "CR-002",
+      "title": "Navigation: replace \"Team\" with \"Pricing\"",
+      "items": [
+        {
+          "type": "frame",
+          "url": "https://www.artaios.ai/en",
+          "pageTitle": "ARTAIOS — Sovereign AI Workforce OS for mid-market companies",
+          "note": "Link to /en/pricing",
+          "annotatedText": [
+            "Pricing"
+          ],
+          "region": {
+            "h": 78,
+            "w": 580,
+            "x": 300,
+            "y": 22
+          },
+          "viewport": {
+            "dpr": 1,
+            "h": 900,
+            "w": 1440
+          },
+          "images": {
+            "annotated": "images/CR-002-1-annotated.png",
+            "clean": "images/CR-002-1-clean.png",
+            "context": "images/CR-002-1-context.jpg"
+          },
+          "dom": {
+            "center": {
+              "selector": "main.bg-background.min-h-screen > header.fixed.inset-x-0 > nav.mx-auto.flex > div.hidden.items-center:nth-of-type(1) > button.flex.items-center:nth-of-type(3)",
+              "tag": "button",
+              "text": "Industries"
+            },
+            "container": {
+              "selector": "body > main.bg-background.min-h-screen",
+              "tag": "main",
+              "text": "// THE AI WORKFORCE. SIMPLIFIED. Platform Compliance Industries Resources Team Contact DE EN Login Start 14-day trial…"
+            },
+            "elements": [
+              {
+                "selector": "main.bg-background.min-h-screen > header.fixed.inset-x-0 > nav.mx-auto.flex > div.hidden.items-center:nth-of-type(1) > button.flex.items-center:nth-of-type(1)",
+                "tag": "button",
+                "text": "Platform"
+              },
+              {
+                "selector": "header.fixed.inset-x-0 > nav.mx-auto.flex > div.hidden.items-center:nth-of-type(1) > button.flex.items-center:nth-of-type(1) > svg.lucide.lucide-chevron-down",
+                "tag": "svg"
+              },
+              {
+                "selector": "main.bg-background.min-h-screen > header.fixed.inset-x-0 > nav.mx-auto.flex > div.hidden.items-center:nth-of-type(1) > button.flex.items-center:nth-of-type(2)",
+                "tag": "button",
+                "text": "Compliance"
+              },
+              {
+                "selector": "header.fixed.inset-x-0 > nav.mx-auto.flex > div.hidden.items-center:nth-of-type(1) > button.flex.items-center:nth-of-type(2) > svg.lucide.lucide-chevron-down",
+                "tag": "svg"
+              },
+              {
+                "selector": "main.bg-background.min-h-screen > header.fixed.inset-x-0 > nav.mx-auto.flex > div.hidden.items-center:nth-of-type(1) > button.flex.items-center:nth-of-type(3)",
+                "tag": "button",
+                "text": "Industries"
+              },
+              {
+                "selector": "header.fixed.inset-x-0 > nav.mx-auto.flex > div.hidden.items-center:nth-of-type(1) > button.flex.items-center:nth-of-type(3) > svg.lucide.lucide-chevron-down",
+                "tag": "svg"
+              },
+              {
+                "selector": "main.bg-background.min-h-screen > header.fixed.inset-x-0 > nav.mx-auto.flex > div.hidden.items-center:nth-of-type(1) > button.flex.items-center:nth-of-type(4)",
+                "tag": "button",
+                "text": "Resources"
+              },
+              {
+                "selector": "header.fixed.inset-x-0 > nav.mx-auto.flex > div.hidden.items-center:nth-of-type(1) > button.flex.items-center:nth-of-type(4) > svg.lucide.lucide-chevron-down",
+                "tag": "svg"
+              },
+              {
+                "href": "/en/team",
+                "selector": "main.bg-background.min-h-screen > header.fixed.inset-x-0 > nav.mx-auto.flex > div.hidden.items-center:nth-of-type(1) > a.text-secondary-foreground.hover\\:text-foreground:nth-of-type(1)",
+                "tag": "a",
+                "text": "Team"
+              },
+              {
+                "href": "/en/kontakt",
+                "selector": "main.bg-background.min-h-screen > header.fixed.inset-x-0 > nav.mx-auto.flex > div.hidden.items-center:nth-of-type(1) > a.text-secondary-foreground.hover\\:text-foreground:nth-of-type(2)",
+                "tag": "a",
+                "text": "Contact"
+              }
+            ]
+          }
+        },
+        {
+          "type": "text",
+          "text": "Prospects ask about pricing in every demo; \"Team\" can move to the footer."
+        }
+      ]
+    }
+  ]
+}

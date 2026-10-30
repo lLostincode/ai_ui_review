@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Web Feedback Change Requests Note Taker",
+  "short_name": "Web Feedback CR",
+  "version": "0.1.0",
+  "description": "Draw and comment on any website, capture annotated screenshots, and export change requests as an AI-ready prompt.",
+  "permissions": ["activeTab", "scripting", "storage", "unlimitedStorage", "contextMenus"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Toggle feedback overlay (Alt+Shift+F)",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "commands": {
+    "toggle-overlay": {
+      "suggested_key": { "default": "Alt+Shift+F" },
+      "description": "Toggle the feedback overlay on the current tab"
+    },
+    "new-frame": {
+      "suggested_key": { "default": "Alt+Shift+S" },
+      "description": "Add a new frame to the active change request"
+    }
+  }
+}

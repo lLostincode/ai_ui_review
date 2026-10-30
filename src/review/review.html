@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Review &amp; Export · Web Feedback</title>
+    <link rel="icon" href="../../icons/icon-32.png" />
+    <link rel="stylesheet" href="review.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand"><span class="dot"></span>Web Feedback Change Requests Note Taker</div>
+      <label class="project">
+        Project
+        <input id="project-name" placeholder="e.g. Customer portal" />
+      </label>
+      <span id="stats" class="muted"></span>
+    </header>
+
+    <main class="layout">
+      <section id="requests" class="requests" aria-label="Change requests"></section>
+
+      <aside class="sidebar">
+        <div class="card">
+          <h2>Export</h2>
+          <p class="muted small">
+            Exports the <strong id="selected-count">0</strong> selected change request(s) as a ZIP with
+            <code>PROMPT.md</code>, <code>feedback.json</code> and an <code>images/</code> folder. Unzip it into your
+            repo (or anywhere) and tell your AI agent: <em>“Read PROMPT.md and implement it.”</em>
+          </p>
+          <div class="options">
+            <label><input type="checkbox" id="opt-clean" checked /> Include clean screenshots (no drawings)</label>
+            <label><input type="checkbox" id="opt-context" checked /> Include full-viewport context images</label>
+            <label><input type="checkbox" id="opt-dom" checked /> Include DOM hints (selectors, text)</label>
+          </div>
+          <div class="buttons">
+            <button id="download-zip" class="primary">Download ZIP</button>
+            <button id="copy-prompt">Copy prompt</button>
+          </div>
+          <div class="buttons secondary">
+            <button id="select-all" class="ghost">Select all</button>
+            <button id="select-none" class="ghost">Select none</button>
+            <button id="delete-all" class="ghost danger">Delete all…</button>
+          </div>
+        </div>
+
+        <details class="card">
+          <summary><h2>Prompt template</h2></summary>
+          <p class="muted small">
+            Placeholders: <code>{{requests}}</code> <code>{{count}}</code> <code>{{origins}}</code>
+            <code>{{project}}</code> <code>{{projectSuffix}}</code> <code>{{date}}</code>. If
+            <code>{{requests}}</code> is missing, the requests are appended.
+          </p>
+          <textarea id="template" rows="16" spellcheck="false"></textarea>
+          <div class="buttons">
+            <button id="reset-template" class="ghost">Reset to default</button>
+          </div>
+        </details>
+
+        <details class="card" open>
+          <summary><h2>Prompt preview</h2></summary>
+          <pre id="preview"></pre>
+        </details>
+      </aside>
+    </main>
+
+    <div id="lightbox" class="lightbox" hidden><img alt="" /></div>
+    <div id="toast" class="toast" hidden></div>
+
+    <script type="module" src="review.js"></script>
+  </body>
+</html>

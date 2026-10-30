@@ -1,0 +1,29 @@
+{
+  "name": "web-feedback-change-requests",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Chrome extension: draw and comment on any website, capture annotated screenshots, export change requests as an AI-ready prompt.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "icons": "node tools/make-icons.mjs",
+    "package": "rm -f dist/web-feedback.zip && mkdir -p dist && zip -r dist/web-feedback.zip manifest.json icons src -x '*.DS_Store'"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lLostincode/ai_ui_review.git"
+  },
+  "keywords": [
+    "chrome-extension",
+    "ui-review",
+    "annotation",
+    "screenshot",
+    "feedback",
+    "ai",
+    "prompt"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}
