@@ -11,6 +11,8 @@ How to read this feedback:
   boxes = "this element", text = what I want.
 - The "clean" image shows the same region without my drawings, and the "context" image shows the
   whole viewport with the region outlined, so you can see where it is on the page.
+- Each frame lists the full URL it was captured on. Its path, query and hash tell you which route
+  (and which page state) to look at.
 - "DOM hints" list selectors, test ids and visible text of elements inside the region. Use them to
   find the responsible components in the code (search for the text, test ids or class names).
 
@@ -35,7 +37,8 @@ How to work:
 Text written on the screenshot:
 - "same height"
 
-- Page: [ARTAIOS — Sovereign AI Workforce OS for mid-market companies](https://www.artaios.ai/en)
+- URL: `https://www.artaios.ai/en`
+- Page title: ARTAIOS — Sovereign AI Workforce OS for mid-market companies
 - Region: 635×97 CSS px at x=165, y=385 (document), viewport 1440×900 @1x
 - Without annotations: `images/CR-001-1-clean.png`
 - Full viewport for context: `images/CR-001-1-context.jpg`
@@ -57,7 +60,8 @@ Text written on the screenshot:
 Text written on the screenshot:
 - "Pricing"
 
-- Page: [ARTAIOS — Sovereign AI Workforce OS for mid-market companies](https://www.artaios.ai/en)
+- URL: `https://www.artaios.ai/en`
+- Page title: ARTAIOS — Sovereign AI Workforce OS for mid-market companies
 - Region: 580×78 CSS px at x=300, y=22 (document), viewport 1440×900 @1x
 - Without annotations: `images/CR-002-1-clean.png`
 - Full viewport for context: `images/CR-002-1-context.jpg`

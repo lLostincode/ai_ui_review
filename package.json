@@ -7,7 +7,7 @@
   "scripts": {
     "test": "node --test test/*.test.js",
     "icons": "node tools/make-icons.mjs",
-    "package": "rm -f dist/web-feedback.zip && mkdir -p dist && zip -r dist/web-feedback.zip manifest.json icons src -x '*.DS_Store'"
+    "package": "node tools/package.mjs"
   },
   "license": "MIT",
   "repository": {

@@ -53,6 +53,7 @@ test('buildExport renders every request with image references and DOM hints', ()
   assert.match(markdown, /- "remove this"/);
   assert.match(markdown, /test id `save-btn`/);
   assert.match(markdown, /Frame on `\/#\/home`/);
+  assert.match(markdown, /- URL: `http:\/\/localhost:3000\/settings`\n- Page title: Settings/);
   assert.match(markdown, /`label\.field` — "Plan"/);
   assert.doesNotMatch(markdown, /icon-chevron/, 'unlabelled icons are dropped');
   assert.equal(images.length, 6);

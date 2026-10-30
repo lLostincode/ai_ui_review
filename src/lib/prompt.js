@@ -14,6 +14,8 @@ How to read this feedback:
   boxes = "this element", text = what I want.
 - The "clean" image shows the same region without my drawings, and the "context" image shows the
   whole viewport with the region outlined, so you can see where it is on the page.
+- Each frame lists the full URL it was captured on. Its path, query and hash tell you which route
+  (and which page state) to look at.
 - "DOM hints" list selectors, test ids and visible text of elements inside the region. Use them to
   find the responsible components in the code (search for the text, test ids or class names).
 
@@ -163,7 +165,8 @@ export function buildExport(state, options = {}) {
       }
 
       const r = item.docRect ?? item.rect;
-      lines.push(`- Page: [${item.pageTitle || pagePath(item.url)}](${item.url})`);
+      lines.push(`- URL: \`${item.url}\``);
+      if (item.pageTitle) lines.push(`- Page title: ${item.pageTitle}`);
       if (r && item.viewport) {
         lines.push(
           `- Region: ${Math.round(r.w)}×${Math.round(r.h)} CSS px at x=${Math.round(r.x)}, y=${Math.round(r.y)} (document), viewport ${item.viewport.w}×${item.viewport.h} @${item.viewport.dpr}x`,

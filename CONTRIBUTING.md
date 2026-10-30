@@ -33,6 +33,17 @@ There is no build step: the files in `src/` are exactly what Chrome loads.
 - **Overlay UI** stays inside the shadow root. Never add global styles or listeners to the host page that remain after the overlay is turned off.
 - Match the existing code style: 2-space indentation, single quotes, semicolons, small functions.
 
+## Releasing
+
+Releases are published automatically by [`.github/workflows/release.yml`](.github/workflows/release.yml):
+
+1. Bump `version` in `manifest.json` and `package.json` (for example `0.2.0`).
+2. Add a `## [0.2.0] - YYYY-MM-DD` section to `CHANGELOG.md`. Its content becomes the release notes.
+3. Push to `main`.
+
+If no release `v<version>` exists yet, the workflow runs the tests, builds `web-feedback-cr-v<version>.zip` with `node tools/package.mjs`, and creates the tag and the GitHub release with the ZIP attached. Pushes that don't change the version do nothing.
+Run `npm run package` locally to check the ZIP and the notes before you push.
+
 ## Reporting bugs
 
 Please include the browser and version, the page type (for example a React SPA on localhost), the steps to reproduce, and any errors from the extension's service worker console (`chrome://extensions` → *Inspect views: service worker*) or the page console.

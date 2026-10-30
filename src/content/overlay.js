@@ -324,7 +324,7 @@
 
     const img = h('img', { class: 'thumb', alt: 'Annotated frame', title: 'Show on page', onclick: () => goToFrame(req, item) });
     getImage(item.images?.annotated).then((src) => { if (src) img.src = src; });
-    const path = (() => { try { const u = new URL(item.url); return u.pathname + u.hash; } catch { return item.url; } })();
+    const path = (() => { try { const u = new URL(item.url); return u.pathname + u.search + u.hash; } catch { return item.url; } })();
     return h('div', { class: 'item frame-item' },
       h('div', { class: 'item-head' },
         h('span', { class: 'kind' }, 'Frame'),

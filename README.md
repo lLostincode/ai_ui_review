@@ -6,6 +6,7 @@
 
 **Draw on any website, collect annotated screenshots into change requests, and export them as a prompt your AI coding agent can implement.**
 
+[![Latest release](https://img.shields.io/github/v/release/lLostincode/ai_ui_review?label=download&color=e11d48)](https://github.com/lLostincode/ai_ui_review/releases/latest)
 [![Tests](https://github.com/lLostincode/ai_ui_review/actions/workflows/test.yml/badge.svg)](https://github.com/lLostincode/ai_ui_review/actions/workflows/test.yml)
 ![Manifest V3](https://img.shields.io/badge/Chrome-Manifest%20V3-4285F4?logo=googlechrome&logoColor=white)
 ![No build step](https://img.shields.io/badge/build-none-brightgreen)
@@ -59,15 +60,24 @@ While you click through your app, you mark what should change. At the end you ha
 
 ## Install
 
-The extension is not on the Chrome Web Store yet. Load it unpacked:
+The extension is not on the Chrome Web Store yet. Install it from a GitHub release:
 
-1. Download this repository (**Code → Download ZIP**, then unzip it) or clone it:
-   ```sh
-   git clone https://github.com/lLostincode/ai_ui_review.git
-   ```
+1. **[Download the latest release](https://github.com/lLostincode/ai_ui_review/releases/latest)**: under *Assets*, get `web-feedback-cr-v<version>.zip`, then unzip it.
 2. Open `chrome://extensions` and switch on **Developer mode** (top right).
-3. Click **Load unpacked** and select the folder that contains `manifest.json`.
+3. Click **Load unpacked** and select the unzipped `web-feedback-cr-v<version>` folder (the one that contains `manifest.json`).
 4. Pin **Web Feedback CR** from the puzzle-piece menu so the icon is always visible.
+
+Keep the folder where it is: Chrome loads the extension from it. To update, download the new release, replace the folder's contents and click ↻ on the extension card. Your change requests are kept.
+
+<details>
+<summary>Install from source instead</summary>
+
+```sh
+git clone https://github.com/lLostincode/ai_ui_review.git
+```
+
+Then follow steps 2–4 and select the cloned folder. Run `git pull` and click ↻ to update.
+</details>
 
 It also works in other Chromium browsers (Edge, Brave, Arc, Opera) through the same "load unpacked" flow.
 
@@ -159,7 +169,8 @@ artaiosai-website-2026-10-30-1205/
 Text written on the screenshot:
 - "same height"
 
-- Page: [ARTAIOS — Sovereign AI Workforce OS …](https://www.artaios.ai/en)
+- URL: `https://www.artaios.ai/en`
+- Page title: ARTAIOS — Sovereign AI Workforce OS for mid-market companies
 - Region: 635×97 CSS px at x=165, y=385 (document), viewport 1440×900 @1x
 - DOM hints:
   - Element at region centre: `… > a.border-border.text-secondary-foreground` — "Book a Demo"
@@ -230,8 +241,10 @@ Requirements: Chrome or another Chromium browser, and Node.js ≥ 20 (only for t
 ```sh
 npm test          # unit tests: prompt generation and ZIP writer
 npm run icons     # regenerate icons/*.png from tools/make-icons.mjs
-npm run package   # zip the extension into dist/ for the Chrome Web Store
+npm run package   # build dist/web-feedback-cr-v<version>.zip + release notes (same as the release workflow)
 ```
+
+**Releases are automatic.** Bump `version` in `manifest.json` and `package.json`, add a matching section to [CHANGELOG.md](CHANGELOG.md), and push to `main`. The [release workflow](.github/workflows/release.yml) runs the tests, builds the ZIP and publishes a GitHub release for any version that hasn't been released yet.
 
 After changing code, click ↻ on the extension card in `chrome://extensions`. Then turn the overlay off and on again in tabs that are already open.
 
